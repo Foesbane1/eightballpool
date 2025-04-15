@@ -76,7 +76,7 @@
 </head>
 <body>
     <div id="instructions">Click the cueball and drag to change direction and power of the shot</div>
-    <div id="gameStatus">Assigned Set: None</div>
+    <div id="gameStatus">Player: None</div>
     <canvas id="gameCanvas" width="800" height="400"></canvas>
     <div id="powerLabel">Shot Power</div>
     <div id="powerMeter">
@@ -249,7 +249,7 @@
             gameOver = false;
             shotInProgress = false;
             firstHitThisShot = null;
-            status.textContent = 'Assigned Set: None';
+            status.textContent = 'Player: None';
             powerFill.style.width = '0%';
             cueBall.x = 200;
             cueBall.y = 200;
@@ -260,6 +260,8 @@
 
         // Physics
         function moveBalls() {
+            let setAssignedThisShot = false; // Track if set is assigned during this shot
+
             balls.forEach(ball => {
                 if (ball.pocketed) return;
                 ball.x += ball.vx;
@@ -330,7 +332,8 @@
                         } else {
                             if (!playerSet && ball.color !== 'black') {
                                 playerSet = ball.color;
-                                status.textContent = `Assigned Set: ${playerSet}`;
+                                setAssignedThisShot = true;
+                                status.textContent = `Player: ${playerSet}`;
                             }
                             if (ball.color === 'black') {
                                 checkBlackBall();
@@ -341,7 +344,8 @@
             });
 
             if (shotInProgress && !isMoving()) {
-                if (firstHitThisShot && playerSet) {
+                // Only check fouls if a set was assigned before this shot
+                if (firstHitThisShot && playerSet && !setAssignedThisShot) {
                     if (firstHitThisShot.color !== playerSet && firstHitThisShot.color !== 'black') {
                         gameOver = true;
                         status.textContent = `Game Over: Hit opponent's ball first!`;
